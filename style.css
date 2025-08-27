@@ -1,0 +1,730 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Chewy&display=swap');
+
+/* ---------- 全局 ---------- */
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f4f4f4;
+  display:flex;justify-content:center;align-items:center;
+  height:100vh;
+}
+
+/* ---------- 布局 ---------- */
+.container{
+  display:flex;
+  width:85%;height:90%;
+  max-width:1150px;
+  border-radius:10px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 4px 8px rgba(0,0,0,.2);
+}
+.sidebar{
+  width:260px;
+  background:rgba(71,91,165,.9);
+  color:#fff;
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px 0;
+}
+.main-content{
+  flex:1;display:flex;flex-direction:column;
+  background:#475BA5; /* 蓝底确保一致 */
+  overflow:hidden;
+}
+
+/* ---------- 顶部工具栏 ---------- */
+.header-bar{
+  position:sticky;top:0;right:0;left:0;
+  height:60px;
+  background:#475BA5;
+  display:flex;align-items:center;justify-content:flex-end;
+  gap:18px;padding:0 20px;
+  z-index:10;
+}
+.header-bar input{
+  width:180px;padding:6px 10px;border-radius:6px;border:none;
+}
+.header-bar i {
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.3s ease; /* 平滑放大 */
+}
+
+.header-bar i:hover {
+  transform: scale(1.3); /* 悬停时放大 30% */
+}
+
+.header-profile{display:flex;align-items:center;gap:6px}
+.profile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.profile-icon:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 12px 4px rgba(255, 255, 255, 0.7);
+}
+.header-profile span{color:#fff;font-weight:bold}
+
+/* ---------- 侧栏按钮 ---------- */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+/* 地球图标：悬停旋转 + 发光（不缩放） */
+.logo-image {
+  width: 60px;
+  height: 60px;
+  transition: transform 0.6s ease, box-shadow 0.4s ease;
+}
+.logo-image:hover {
+  transform: rotate(360deg);
+  box-shadow: 0 0 12px 4px #00ffff;
+}
+
+/* 产品文字：悬停放大 */
+.logo-text {
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+  transition: transform 0.3s ease;
+}
+.logo-text:hover {
+  transform: scale(1.1);
+}
+
+.nav-btn{
+  width:80%;padding:10px;margin:8px 0;
+  background:transparent;color:#fff;border:none;border-radius:5px;
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;cursor:pointer;white-space:nowrap;
+  transition:background .25s;
+}
+.nav-btn i{font-size:18px}
+.nav-btn:hover{background:rgba(255,255,255,.15)}
+.nav-btn.active{background:#3a4f99;font-weight:bold}
+
+/* ---------- 内容区 ---------- */
+.content{
+  flex:1;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  padding:25px;
+  overflow:auto;
+}
+.content.active{display:flex}
+.full-image,
+.content img,
+.content-image-large{
+  max-width:92%;max-height:92%;
+  border-radius:12px;object-fit:contain;
+}
+
+/* Math Stories 网格 */
+/* === Math Stories – 书架排版（1行4本） =========================== */
+
+.book-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);  /* 强制一行四列 */
+  gap: 24px;
+  padding: 30px;
+  justify-items: center;
+}
+
+.book-item {
+  width: 100%;
+  max-width: 160px;              /* 限定最大宽度以适应 4 本书 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s;
+}
+.book-item:hover {
+  transform: scale(1.14);
+
+}
+
+.book-image {
+  width: 100%;
+  height: 220px;                 /* 稍微减小高度 */
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.book-title {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* 外部 link 区域 */
+.external-link{width:100%;display:flex;justify-content:center;align-items:center}
+.external-link a{color:#fff;font-size:22px;text-decoration:underline;font-weight:bold}
+
+.magic-switch {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(71, 91, 165, 0.9);
+  color: white;
+  font-size: 24px;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  transition: all 0.4s ease;
+}
+.magic-switch:hover {
+  transform: rotate(20deg) scale(1.1);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+}
+
+body.night-mode {
+  background-color: #4055a5; /* 更温和的夜间蓝色 */
+}
+.container {
+  background-color:#fff; /* 默认白色底，避免覆盖主内容和侧栏背景 */
+}
+.main-content {
+  background-color: #475BA5;
+}
+.header-bar {
+  background-color: #475BA5;
+}
+.sidebar {
+  background-color: rgba(71, 91, 165, 0.95); /* 原色略微提亮 */
+}
+
+body.theme-night {
+  background-color: #3a3f79;
+}
+body.theme-fantasy {
+  background-color: #ffe6f7;
+}
+body.theme-dark {
+  background-color: #1a1a1a;
+  color: #f5f5f5;
+}
+
+body.theme-night .container,
+body.theme-fantasy .container,
+body.theme-dark .container {
+  background-color: inherit;
+}
+body.theme-night .main-content,
+body.theme-fantasy .main-content,
+body.theme-dark .main-content {
+  background-color: inherit;
+}
+body.theme-night .header-bar,
+body.theme-fantasy .header-bar,
+body.theme-dark .header-bar {
+  background-color: inherit;
+}
+body.theme-night .sidebar {
+  background-color: rgba(60, 80, 160, 0.9);
+}
+body.theme-fantasy .sidebar {
+  background-color: rgba(255, 192, 240, 0.8);
+}
+body.theme-dark .sidebar {
+  background-color: rgba(40, 40, 40, 0.95);
+}
+
+/* =========================
+   Math Tutor 聊天 UI
+   ========================= */
+
+section[id="AI Assistant"].content {
+  flex-direction: column;
+  justify-content: flex-start;   /* 顶部开始 */
+  align-items: center;           /* 横向居中 */
+  gap: 18px;
+  padding-top: 22px;             /* 与顶部工具栏留距 */
+}
+
+/* 顶部 Hero：图标 + 标题（居中、带阴影） */
+.mv-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.mv-hero-logo {
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  box-shadow: 0 6px 14px rgba(0,0,0,.22);
+}
+.mv-hero-title {
+  margin: 4px 0 0;
+  font-size: 24px;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0,0,0,.25);
+  letter-spacing: .3px;
+}
+
+/* 对话卡片容器（宽度自适应，居中） */
+.mv-card {
+  width: min(900px, 92%);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.10);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 消息区在上、可滚动 */
+.mv-messages {
+  min-height: 220px;
+  max-height: clamp(300px, 52vh, 560px);
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 输入区在下 */
+.mv-composer {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  gap: 10px;
+  padding: 12px;
+  border-top: 1px solid #edf0f5;
+  background: linear-gradient(180deg, #fff, #fafbff);
+}
+#mv-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  resize: vertical;
+  min-height: 46px;
+  font-size: 14.5px;
+}
+.mv-send {
+  border: none;
+  border-radius: 10px;
+  background: #3a4f99;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mv-send:hover { filter: brightness(1.06); }
+
+
+.mv-msg {
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 78%;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  box-shadow: 0 4px 12px rgba(20,28,80,.06);
+}
+.mv-user { align-self: flex-end; background: #eef4ff; }
+.mv-assistant { align-self: flex-start; background: #f7f7f7; }
+
+/* NIGHT 主题下：卡片/标题/输入区 */
+body.theme-night .mv-hero-title { color:#ffffff; text-shadow:0 2px 10px rgba(0,0,40,.35); }
+body.theme-night .mv-card       { background:#f9fbff; border-color:#e2e8ff; }
+body.theme-night .mv-messages   { background:#f6f7ff; }
+body.theme-night .mv-user       { background:#e8f1ff; }
+body.theme-night .mv-assistant  { background:#edf0ff; }
+body.theme-night .mv-composer   { background:linear-gradient(180deg,#fff,#f3f6ff); }
+body.theme-night #mv-input      { background:#fff; color:#0f1b4f; border-color:#d9e3ff; }
+body.theme-night .mv-send       { background:#3a4f99; color:#fff; }
+
+/* FANTASY 主题下：偏粉系 */
+body.theme-fantasy .mv-hero-title { color:#5b2a4f; text-shadow:0 2px 10px rgba(120,0,80,.25); }
+body.theme-fantasy .mv-card       { background:#fff7fb; border-color:#ffd8f0; }
+body.theme-fantasy .mv-messages   { background:#fff8fd; }
+body.theme-fantasy .mv-user       { background:#ffe9f7; }
+body.theme-fantasy .mv-assistant  { background:#fff2fb; }
+body.theme-fantasy .mv-composer   { background:linear-gradient(180deg,#fff,#fff1fa); }
+body.theme-fantasy #mv-input      { background:#fff; border-color:#ffd8f0; }
+body.theme-fantasy .mv-send       { background:#cc73c9; color:#fff; }
+
+/* DARK 主题下：深色卡片与输入区 */
+body.theme-dark .mv-hero-title { color:#f5f5ff; text-shadow:0 2px 10px rgba(0,0,0,.6); }
+body.theme-dark .mv-card       { background:#1f2134; border-color:#2c2e4a; }
+body.theme-dark .mv-messages   { background:transparent; color:#e6e9ff; }
+body.theme-dark .mv-user       { background:#333b55; color:#e6e9ff; }
+body.theme-dark .mv-assistant  { background:#2a2f4a; color:#e6e9ff; }
+body.theme-dark .mv-composer   { background:linear-gradient(180deg,#1f2134,#1c1f32); }
+body.theme-dark #mv-input      { background:#1f2134; color:#e6e9ff; border-color:#2c2e4a; }
+body.theme-dark .mv-send       { background:#5279ff; color:#fff; }
+
+
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .mv-msg { max-width: 100%; }
+  #mv-input { min-height: 60px; }
+}
+
+/* ============  Daily Review 页面 ============ */
+/* 仅当 Daily Review 被激活时应用排版，不改变 display */
+section[id="Daily Review"].content.daily-review{
+  /* 2) 居中在可视区中间 */
+  justify-content: center;       /* 垂直居中 */
+  align-items: center;           /* 水平居中 */
+  flex-direction: column;
+  gap: 18px;
+  padding: 40px 0;               /* 比较舒服的上下留白 */
+}
+
+
+/* 卡片容器（半透明+柔和阴影） */
+section[id="Daily Review"].daily-review .dr-card{
+  width:min(760px, 92%);
+  padding:28px 36px;
+  background: rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.22);
+  border-radius:18px;
+  box-shadow:0 14px 34px rgba(0,0,0,.18);
+  backdrop-filter: blur(6px);
+}
+
+/* 标题居中，其余全部左对齐（第 3 点） */
+section[id="Daily Review"].daily-review .dr-title{
+  margin:0 0 6px 0;
+  text-align:center;
+  font-family: "Chewy", system-ui;
+  font-size:36px; line-height:1.1;
+  color:#fff;
+  text-shadow:0 2px 10px rgba(0,0,0,.28);
+}
+section[id="Daily Review"].daily-review .dr-lead,
+section[id="Daily Review"].daily-review .dr-line{
+  text-align:left;                /* ← 全部左对齐 */
+  font-family: inherit;     /* ← 用全站默认字体（你的 body 是 Arial/Helvetica） */
+  font-style: normal;       /* ← 明确不是 italic */
+  font-weight: 400;         /* ← 常规字重 */
+  line-height:1.7;
+  max-width:62ch;
+  margin:8px 0;
+  color:#ffffff;                  /* 4) 默认深色主题下白字 */
+}
+
+/* 按钮（第 3 点：像按钮、有阴影） */
+/* Daily Review 的按钮：始终蓝底 + 居中 + 白字 */
+section[id="Daily Review"].daily-review .dr-cta{
+  appearance:none; -webkit-appearance:none;
+  display:inline-block;                 /* 让 margin: auto 能生效 */
+  margin:16px auto 0;                   /* ← 居中（左右 auto） */
+  padding:12px 26px;
+  background:#64B2D8;
+  color:#fff !important;                /* 你说不随主题变，白字固定 */
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:12px;
+  font-weight:800; font-size:18px; letter-spacing:.3px;
+  cursor:pointer;
+  box-shadow:
+    0 12px 24px rgba(100,178,216,.35),
+    inset 0 1px 0 rgba(255,255,255,.35),
+    inset 0 -2px 0 rgba(0,0,0,.12);
+  transition: transform .06s ease, filter .15s ease;
+}
+section[id="Daily Review"].daily-review .dr-cta:hover{ filter:brightness(1.06) }
+section[id="Daily Review"].daily-review .dr-cta:active{ transform: translateY(1px) }
+
+
+
+/* 浅色主题（fantasy）：正文改黑字、按钮字也改黑，提高对比度 */
+body.theme-fantasy section[id="Daily Review"].daily-review .dr-card{
+  background: rgba(255,255,255,.22);
+}
+body.theme-fantasy section[id="Daily Review"].daily-review .dr-lead,
+body.theme-fantasy section[id="Daily Review"].daily-review .dr-line{
+  color:#111 !important;         /* 仅浅色主题 → 黑字 */
+  text-shadow:none;
+}
+section[id="Daily Review"].daily-review .dr-cta{
+  /* ... 原有样式保持不变 ... */
+  color:#fff !important;   /* ← 按钮文字永远白色 */
+}
+
+/* 深色主题：维持白字 */
+body.theme-night section[id="Daily Review"].daily-review .dr-lead,
+body.theme-night section[id="Daily Review"].daily-review .dr-line,
+body.theme-dark  section[id="Daily Review"].daily-review .dr-lead,
+body.theme-dark  section[id="Daily Review"].daily-review .dr-line{
+  color:#ffffff;
+}
+
+
+/* 移动端微调 */
+@media (max-width: 768px){
+  section[id="Daily Review"].daily-review .dr-card{ width:94%; padding:22px 18px; }
+  section[id="Daily Review"].daily-review .dr-title{ font-size:30px; }
+  section[id="Daily Review"].daily-review .dr-line{ font-size:17px; }
+}
+
+/* ===== My Collection 布局 ===== */
+.collection{ flex-direction:column; align-items:center; gap:14px; }
+.collection .col-header{
+  width:min(900px,92%); display:flex; align-items:center; justify-content:space-between;
+  color:#fff;
+}
+.collection .col-actions{ display:flex; gap:10px; }
+.collection .btn{
+  padding:8px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.15); color:#fff; cursor:pointer;
+}
+.collection .btn.primary{ background:#3a4f99; border-color:#2e3f85; }
+.collection select{
+  padding:8px 10px; border-radius:8px; border:1px solid #d1d5db;
+}
+
+/* 编辑器卡片 */
+.collection .editor{
+  width:min(900px,92%); background:#fff; border:1px solid #e5e7eb; border-radius:14px;
+  box-shadow:0 10px 24px rgba(0,0,0,.10); overflow:hidden;
+}
+.collection .editor.hidden{ display:none; }
+.collection .editor-toolbar{
+  display:flex; gap:8px; padding:10px; border-bottom:1px solid #edf0f5; background:#fafbff;
+}
+.collection .editor-toolbar .sep{ width:1px; background:#e5e7eb; margin:0 6px; }
+.collection .editor-toolbar button{
+  border:none; background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:6px 8px; cursor:pointer;
+}
+.collection .editor-title{
+  width:100%; border:none; outline:none; padding:12px 14px; font-size:18px; border-bottom:1px solid #f1f2f6;
+}
+.collection .editor-body{
+  min-height:180px; padding:14px; outline:none;
+}
+.collection .editor-body:empty:before{
+  content: attr(data-placeholder); color:#9aa3b2;
+}
+.collection .editor-footer{ display:flex; justify-content:flex-end; gap:8px; padding:10px; border-top:1px solid #edf0f5; }
+
+/* 列表卡片 */
+.collection .col-list{
+  width:min(900px,92%); display:grid; grid-template-columns:1fr; gap:12px; padding-bottom:10px;
+}
+.collection .col-item{
+  background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:12px;
+  display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:start;
+}
+.collection .col-item .meta{ color:#6b7280; font-size:12px; margin-top:6px; }
+.collection .col-item .actions{ display:flex; gap:8px; }
+.collection .tag{ display:inline-block; font-size:12px; padding:2px 8px; border-radius:6px; background:#eef2ff; color:#3a4f99; }
+
+/* checklist 简样式 */
+.collection .editor-body ul.checklist{ list-style:none; padding-left:0; }
+.collection .editor-body ul.checklist li{ margin:6px 0; }
+.collection .editor-body ul.checklist input[type="checkbox"]{ margin-right:8px; }
+
+/* Math Stories 收藏按钮（右上角小星标） */
+.book-item{ position:relative; }
+.collect-btn{
+  position:absolute; top:8px; right:8px; width:28px; height:28px; border:none; border-radius:50%;
+  background:rgba(0,0,0,.35); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.collect-btn:hover{ filter:brightness(1.1); }
+
+/* 预览：两行省略 */
+.collection .col-item .snippet{
+  color:#4b5563;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  max-height:3.2em;
+}
+
+/* 弹窗 */
+.col-modal.hidden{ display:none; }
+.col-modal{
+  position:fixed; inset:0; background:rgba(0,0,0,.45);
+  display:flex; align-items:center; justify-content:center; z-index:999;
+}
+.col-modal-content{
+  width:min(900px,92%); background:#fff; border-radius:14px; overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+.col-modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:8px; padding:10px; border-bottom:1px solid #edf0f5; background:#fafbff;
+}
+.col-modal .editor-title{ border:none; outline:none; font-size:20px; flex:1; }
+.col-modal .editor-body{ min-height:260px; background:#fff; }
+
+/* 分享面板 */
+.share-sheet{ display:flex; gap:8px; padding:10px; border-top:1px solid #edf0f5; background:#fafbff; }
+.share-sheet.hidden{ display:none; }
+.share-sheet button{ border:1px solid #e5e7eb; background:#fff; border-radius:8px; padding:6px 10px; cursor:pointer; }
+
+/* 右键菜单 */
+.col-menu.hidden{ display:none; }
+.col-menu{
+  position:fixed; z-index:1000; background:#fff; border:1px solid #e5e7eb; border-radius:8px;
+  box-shadow:0 10px 24px rgba(0,0,0,.14); overflow:hidden;
+}
+.col-menu button{
+  display:block; width:100%; text-align:left; padding:8px 12px; border:none; background:#fff; cursor:pointer;
+}
+.col-menu button:hover{ background:#f6f7ff; }
+
+/* Math Stories 星标：可切换 */
+.collect-btn{ transition: filter .15s ease, transform .06s ease; }
+.collect-btn.on{ background:#ffd86a; color:#7a4b00; box-shadow:0 6px 14px rgba(0,0,0,.25); }
+.collect-btn:active{ transform: translateY(1px); }
+
+/* Community Plaza 分享的卡片（简版） */
+.plaza-feed{ width:min(900px,92%); margin:0 auto; display:grid; gap:12px; }
+.plaza-card{ background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:12px; }
+.plaza-card .meta{ color:#6b7280; font-size:12px; margin-top:6px; }
+
+/* ===== Daily Practice - Map ===== */
+.dp-board{
+  position: relative;
+  width: min(980px, 92%);
+  /* 让容器居中 */
+  margin: 0 auto;
+}
+.dp-map{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:16px;
+  box-shadow:0 12px 32px rgba(0,0,0,.18);
+}
+
+/* 钉子（依赖 Font Awesome 已在 <head> 引入） */
+.dp-pin{
+  position:absolute;
+  transform: translate(-50%, -100%); /* 钉尖对准坐标 */
+  border:none;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+}
+.dp-pin i{
+  font-size:28px;
+  color:#ff8a00;               /* 钉子主色 */
+  text-shadow: 0 2px 8px rgba(0,0,0,.25);
+  transition: transform .15s ease, filter .15s ease;
+}
+.dp-pin:hover i{ transform: translateY(-2px) scale(1.06); filter: brightness(1.05); }
+
+/* 呼吸圈（给绑定了 data-url 的钉子加动效） */
+.dp-pin .dp-pulse{
+  position:absolute; left:50%; top:50%;
+  width:10px; height:10px; border-radius:50%;
+  transform: translate(-50%,-50%);
+  box-shadow: 0 0 0 0 rgba(255,138,0,.55);
+  animation: dpPulse 1.8s infinite;
+  pointer-events:none;
+}
+@keyframes dpPulse{
+  0%   { box-shadow: 0 0 0 0     rgba(255,138,0,.55); }
+  70%  { box-shadow: 0 0 0 18px  rgba(255,138,0,0); }
+  100% { box-shadow: 0 0 0 0     rgba(255,138,0,0); }
+}
+
+/* 浅色主题适配：让钉子阴影更柔和 */
+body.theme-fantasy .dp-map{ box-shadow:0 10px 26px rgba(120,0,80,.16); }
+
+/* ========== Community Plaza ========== */
+.plaza .plaza-feed{
+  width: min(940px, 92%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.post-card{
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 16px;
+  background: #fff;
+  border: 1px solid #e8ebf4;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+.post-card:hover{ box-shadow: 0 10px 28px rgba(0,0,0,.10); }
+
+.post-main{ display:flex; flex-direction:column; gap:8px; }
+.post-head{ display:flex; align-items:center; gap:10px; font-size:13px; color:#6b7280; }
+.post-head .avatar{
+  width: 28px; height: 28px; border-radius: 50%;
+  display:grid; place-items:center; color:#fff; font-weight:700; font-size:13px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+}
+.post-head .chan{ font-weight:600; color:#4b5563; }
+.post-head .dot{ width:4px; height:4px; border-radius:50%; background:#cfd4e6; display:inline-block; margin:0 6px; }
+
+.post-title{
+  font-size: 19px; line-height:1.35;
+  color:#1f2937; font-weight:700;
+}
+.post-meta{ font-size:12px; color:#6b7280; }
+
+.post-thumb{
+  width: 100%; height: 96px; object-fit: cover;
+  border-radius: 10px; border: 1px solid #eef1f7;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+}
+
+/* 主题适配 */
+body.theme-dark .post-card{
+  background:#1f2134; border-color:#2c2e4a; box-shadow:none;
+}
+body.theme-dark .post-title{ color:#e8ecff; }
+body.theme-dark .post-head, body.theme-dark .post-meta{ color:#a8b0d6; }
+body.theme-fantasy .post-card{ background:#fff7fb; border-color:#ffd8f0; }
+
+/* --- Plaza: hover 放大 & 星标按钮 --- */
+.post-card{
+  position: relative;                         /* 让右上角星标绝对定位 */
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.post-card:hover{
+  transform: translateY(-2px) scale(1.012);
+  box-shadow: 0 14px 36px rgba(0,0,0,.16);
+}
+
+/* 右上角收藏星标 */
+.post-star{
+  position:absolute; top:8px; right:10px;
+  border:none; background:#fff; color:#98a2b3;
+  width:32px; height:32px; border-radius:50%;
+  display:grid; place-items:center; cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,.10);
+  transition: transform .1s ease, filter .15s ease, color .15s ease, background .15s ease;
+}
+.post-star:hover{ transform: scale(1.06); filter: brightness(1.02); }
+.post-star.on{ background:#fff7d8; color:#b97300; } /* 选中时“金色”感 */
+
+/* 暗色/粉色主题微调 */
+body.theme-dark .post-star{ background:#2a2f4a; color:#c6cbe8; }
+body.theme-dark .post-star.on{ background:#4a3b12; color:#ffd86a; }
+body.theme-fantasy .post-star{ background:#fff0fb; color:#b08bb3; }
+body.theme-fantasy .post-star.on{ background:#ffe8b6; color:#a86500; }
+
+
+
