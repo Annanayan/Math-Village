@@ -64,40 +64,79 @@
 
 
 
-      <section id="Daily Practice" class="content hidden dp">
-        <div class="dp-board" role="region" aria-label="Practice map">
-            <!-- 地图 -->
-            <img src="images/math map_green.png" alt="Math Map" class="dp-map" />
+      <section id="Daily Practice" class="content hidden dp3d">
+       <div class="dp3d-stage" role="region" aria-label="Daily Practice map">
+       <!-- Terrain background -->
+       <div class="dp3d-terrain"></div>
 
-            <!-- 钉子：用百分比定位（可按需微调 top/left） -->
-            <!-- ① 这个钉子直达 Voiceflow -->
-            <button class="dp-pin" style="top:58%; left:36%;"
-                    aria-label="Start today's practice"
-                    title="Start today's practice"
-                    data-url="https://creator.voiceflow.com/prototype/67c20b63d2f15c9ea5e63754">
-              <i class="fas fa-map-marker-alt"></i>
-              <span class="dp-pulse"></span>
-            </button>
 
-            <!-- 其余示例钉子（占位，未绑定 URL，可按需增加/删除/改位置） -->
-            <button class="dp-pin" style="top:30%; left:48%;" aria-label="Algebra hub" title="Algebra hub">
-              <i class="fas fa-map-marker-alt"></i>
-            </button>
+       <!-- Rivers -->
+       <div class="dp3d-river dp3d-river-1"></div>
+       <div class="dp3d-river dp3d-river-2"></div>
 
-            <button class="dp-pin" style="top:40%; left:62%;" aria-label="Geometry hub" title="Geometry hub">
-              <i class="fas fa-map-marker-alt"></i>
-            </button>
 
-            <button class="dp-pin" style="top:72%; left:83%;" aria-label="Calculus hub" title="Calculus hub">
-              <i class="fas fa-map-marker-alt"></i>
-            </button>
+       <!-- Progress pill -->
+       <div class="dp3d-progress" aria-live="polite">
+       <div class="dp3d-progress-title">Learning Progress</div>
+       <div class="dp3d-progress-bar"><div class="dp3d-progress-fill" style="width:30%"></div></div>
+       <div class="dp3d-progress-note"><span id="dp3d-progress-text">3 of 10 stations completed</span></div>
+       </div>
 
-            <button class="dp-pin" style="top:52%; left:54%;" aria-label="Number sense" title="Number sense">
-              <i class="fas fa-map-marker-alt"></i>
-            </button>
-          </div>
-        </section>
 
+       <!-- Connection paths -->
+       <div class="dp3d-path" style="top:20%; left:15%; width:120px; transform: rotate(25deg);"></div>
+       <div class="dp3d-path" style="top:35%; left:25%; width:100px; transform: rotate(-10deg);"></div>
+       <div class="dp3d-path" style="top:45%; left:40%; width:80px; transform: rotate(45deg);"></div>
+       <div class="dp3d-path is-locked" style="top:60%; left:30%; width:90px; transform: rotate(15deg);"></div>
+       <div class="dp3d-path is-locked" style="top:70%; left:50%; width:110px; transform: rotate(-20deg);"></div>
+
+
+       <!-- Stations -->
+       <div class="dp3d-station is-completed" style="top:15%; left:12%;" data-topic="numbers" tabindex="0" role="button" aria-label="Number Sense (completed)">
+       <div class="dp3d-icon">🔢</div>
+       <div class="dp3d-title">Number Sense</div>
+       </div>
+
+
+       <div class="dp3d-station is-completed" style="top:30%; left:28%;" data-topic="addition" tabindex="0" role="button" aria-label="Addition (completed)">
+       <div class="dp3d-icon">➕</div>
+       <div class="dp3d-title">Addition</div>
+       </div>
+
+
+       <div class="dp3d-station is-completed" style="top:40%; left:45%;" data-topic="subtraction" tabindex="0" role="button" aria-label="Subtraction (completed)">
+       <div class="dp3d-icon">➖</div>
+       <div class="dp3d-title">Subtraction</div>
+       </div>
+
+
+       <div class="dp3d-station is-current" style="top:50%; left:35%;" data-topic="multiplication" tabindex="0" role="button" aria-label="Multiplication (current)">
+       <div class="dp3d-icon">✖️</div>
+       <div class="dp3d-title">Multiplication</div>
+       </div>
+
+
+       <div class="dp3d-station is-available" style="top:65%; left:50%;" data-topic="division" tabindex="0" role="button" aria-label="Division (available)">
+       <div class="dp3d-icon">➗</div>
+       <div class="dp3d-title">Division</div>
+       </div>
+
+
+       <div class="dp3d-station is-locked" style="top:25%; left:65%;" data-topic="fractions" tabindex="0" role="button" aria-label="Fractions (locked)">
+       <div class="dp3d-icon">🧩</div>
+       <div class="dp3d-title">Fractions</div>
+       </div>
+
+
+       <div class="dp3d-station is-locked" style="top:45%; left:75%;" data-topic="decimals" tabindex="0" role="button" aria-label="Decimals (locked)">
+       <div class="dp3d-icon">🔸</div>
+       <div class="dp3d-title">Decimals</div>
+       </div>
+
+
+       <div class="dp3d-station is-locked" style="top:70%; left:70%;" data-topic="geometry" tabindex="0" role="button" aria-label="Geometry (locked)">
+       <div class="dp3d-icon">📐</div>
+       </section>
 
       <section id="Math Stories"    class="content hidden">
         <div class="book-grid">
