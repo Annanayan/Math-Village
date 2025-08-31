@@ -34,67 +34,68 @@ function toggleTheme() {
 window.toggleTheme = toggleTheme;
 
 
+// ===== Daily Practice - Map pins =====
+(function bindPracticePins(){
+  const container = document.querySelector('#Daily Practice.dp');
+  if (!container) return;
 
-// ===== Daily Practice 3D Map (dp3d) =====
-(function initDailyPractice3D(){
-const section = document.getElementById('Daily Practice');
-if (!section) return;
-const stage = section.querySelector('.dp3d-stage');
-if (!stage) return;
+  // 只给有 data-url 的钉子绑定跳转
+  container.addEventListener('click', (e)=>{
+    const pin = e.target.closest('.dp-pin');
+    if (!pin) return;
+    const url = pin.dataset.url;
+    if (url) window.open(url, '_blank', 'noopener');
+  });
 
+  // 键盘可达性：Enter/Space 触发
+  container.addEventListener('keydown', (e)=>{
+    const pin = e.target.closest('.dp-pin');
+    if (!pin) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      pin.click();
+    }
+  });
 
-// 1) Configure stations & Voiceflow links here
-// Replace the placeholder URL(s) with your real Voiceflow prototype links per topic.
-const VF = 'https://creator.voiceflow.com/prototype/67c20b63d2f15c9ea5e63754';
-const stationData = {
-numbers: { icon:'🔢', title:'Number Sense', description:'Master the fundamentals of numbers and counting. This station covers basic number recognition, counting, and relationships.', url: VF },
-addition: { icon:'➕', title:'Addition', description:'Add with confidence: single- and multi-digit practice.', url: VF },
-subtraction: { icon:'➖', title:'Subtraction', description:'Take away and compare: single- and multi-digit practice.', url: VF },
-multiplication:{ icon:'✖️', title:'Multiplication', description:'Discover repeated addition. Learn tables and strategies.', url: VF },
-division: { icon:'➗', title:'Division', description:'Share equally and divide. Practice facts and long division.', url: null },
-fractions: { icon:'🧩', title:'Fractions', description:'Understand parts of a whole and compare fractions.', url: null },
-decimals: { icon:'🔸', title:'Decimals', description:'Explore decimals and their relation to fractions.', url: null },
-geometry: { icon:'📐', title:'Geometry', description:'Shapes, angles, and spatial reasoning.', url: null },
-algebra: { icon:'🔤', title:'Algebra', description:'Variables, expressions, and equations.', url: null },
-statistics: { icon:'📊', title:'Statistics', description:'Collect, analyze, and interpret data.', url: null },
-};
-
-
-// 2) Modal elements
-const modal = document.getElementById('dp3d-modal');
-const modalIcon = document.getElementById('dp3d-modal-icon');
-const modalTitle = document.getElementById('dp3d-modal-title');
-const modalDesc = document.getElementById('dp3d-modal-desc');
-const btnClose = document.getElementById('dp3d-close');
-const btnStart = document.getElementById('dp3d-start');
-const progressText = document.getElementById('dp3d-progress-text');
-const progressFill = section.querySelector('.dp3d-progress-fill');
-
-
-let currentTopic = null;
-
-
-function openModal(){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
-function closeModal(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); currentTopic = null; }
-
-
-function showStationModal(topic){
-const data = stationData[topic]; if (!data) return;
-currentTopic = topic;
-modalIcon.textContent = data.icon;
-modalTitle.textContent = data.title;
-modalDesc.textContent = data.description;
-btnStart.disabled = !data.url;
-btnStart.textContent = data.url ? 'Start Practice' : 'Coming Soon';
-openModal();
-}
-
-
-function showLockedModal(){
-currentTopic = null;
-modalIcon.textContent = '🔒';
+  // 让所有钉子能被 Tab 聚焦
+  container.querySelectorAll('.dp-pin').forEach(pin => pin.setAttribute('tabindex','0'));
 })();
 
+  // —— Math Stories：星标切换（收藏/取消收藏） —— //
+  function syncStoryStars(){
+    const items = load().filter(i=>i.type==='story');
+    const titles = new Set(items.map(i=>i.title));
+    document.querySelectorAll('.book-item').forEach(card=>{
+      const title = card.querySelector('.book-title')?.textContent?.trim();
+      const btn = card.querySelector('.collect-btn');
+      if (!btn) return;
+      if (titles.has(title)) btn.classList.add('on'); else btn.classList.remove('on');
+    });
+  }
+
+  document.querySelectorAll('.book-item').forEach(card=>{
+    if (card.querySelector('.collect-btn')) return;
+    const btn = document.createElement('button');
+    btn.className='collect-btn'; btn.title='Collect';
+    btn.innerHTML = '<i class="fas fa-star"></i>';
+    card.appendChild(btn);
+  });
+
+  // 绑定切换
+  document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const card  = btn.closest('.book-item');
+      const title = card.querySelector('.book-title')?.textContent?.trim() || 'Story';
+      const items = load();
+      const idx   = items.findIndex(i=>i.type==='story' && i.title===title);
+      if (idx>=0){
+        items.splice(idx,1);               // 取消收藏
+      }else{
+        items.push({ id:'s_'+Date.now(), type:'story', title, content:'Saved from Math Stories', createdAt:Date.now() });
+      }
+      save(items); render(); syncStoryStars();
+    });
+  });
 
 
 // =======================
@@ -505,44 +506,6 @@ modalIcon.textContent = '🔒';
       savePlaza(posts);
       alert('Shared to Community Plaza.');
     }
-  });
-
-
-  
-  // —— Math Stories：星标切换（收藏/取消收藏） —— //
-  function syncStoryStars(){
-    const items = load().filter(i=>i.type==='story');
-    const titles = new Set(items.map(i=>i.title));
-    document.querySelectorAll('.book-item').forEach(card=>{
-      const title = card.querySelector('.book-title')?.textContent?.trim();
-      const btn = card.querySelector('.collect-btn');
-      if (!btn) return;
-      if (titles.has(title)) btn.classList.add('on'); else btn.classList.remove('on');
-    });
-  }
-
-  document.querySelectorAll('.book-item').forEach(card=>{
-    if (card.querySelector('.collect-btn')) return;
-    const btn = document.createElement('button');
-    btn.className='collect-btn'; btn.title='Collect';
-    btn.innerHTML = '<i class="fas fa-star"></i>';
-    card.appendChild(btn);
-  });
-
-  // 绑定切换
-  document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const card  = btn.closest('.book-item');
-      const title = card.querySelector('.book-title')?.textContent?.trim() || 'Story';
-      const items = load();
-      const idx   = items.findIndex(i=>i.type==='story' && i.title===title);
-      if (idx>=0){
-        items.splice(idx,1);               // 取消收藏
-      }else{
-        items.push({ id:'s_'+Date.now(), type:'story', title, content:'Saved from Math Stories', createdAt:Date.now() });
-      }
-      save(items); render(); syncStoryStars();
-    });
   });
 
   
