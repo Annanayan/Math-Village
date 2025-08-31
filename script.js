@@ -107,7 +107,7 @@ modalIcon.textContent = '🔒';
   if (!messages || !form || !input) return;
 
   // ★ 把它换成后端地址
-  const ENDPOINT = 'https://YOUR_BACKEND_ENDPOINT/chat';
+  const ENDPOINT = 'http://localhost:3000/chat';
 
   // —— 关键：保持“AI Assistant”标签页处于激活 —— //
   function keepAssistantActive() {
