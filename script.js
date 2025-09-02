@@ -1,3 +1,168 @@
+// ========== 用户认证系统 ==========
+(function initAuth() {
+  const authPage = document.getElementById('auth-page');
+  const mainContainer = document.querySelector('.container');
+  const registerForm = document.getElementById('register-form');
+  const loginForm = document.getElementById('login-form');
+  const authTabs = document.querySelectorAll('.auth-tab');
+  const authSwitch = document.getElementById('auth-switch');
+  
+  // 检查是否已登录
+  const currentUser = localStorage.getItem('mv_current_user');
+  if (currentUser) {
+    // 已登录，隐藏登录页，显示主页
+    authPage?.classList.add('hidden');
+    updateUserDisplay(currentUser);
+  } else {
+    // 未登录，显示登录页，隐藏主页
+    if (mainContainer) mainContainer.style.display = 'none';
+  }
+
+  // 标签切换
+  authTabs?.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const mode = tab.dataset.mode;
+      authTabs.forEach(t => t.classList.toggle('active', t === tab));
+      
+      if (mode === 'register') {
+        registerForm?.classList.add('active');
+        loginForm?.classList.remove('active');
+        if (authSwitch) authSwitch.textContent = 'Login instead';
+      } else {
+        loginForm?.classList.add('active');
+        registerForm?.classList.remove('active');
+        if (authSwitch) authSwitch.textContent = 'Register instead';
+      }
+    });
+  });
+
+  // 切换链接
+  authSwitch?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const activeTab = document.querySelector('.auth-tab.active');
+    const nextMode = activeTab?.dataset.mode === 'register' ? 'login' : 'register';
+    document.querySelector(`.auth-tab[data-mode="${nextMode}"]`)?.click();
+  });
+
+  // 注册表单提交
+  registerForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('reg-username').value.trim();
+    const password = document.getElementById('reg-password').value;
+    // 验证密码长度
+    if (password.length < 6) {
+      const pwError = document.getElementById('password-error');
+      if (pwError) {
+        pwError.classList.add('show');
+      }
+      return; // 阻止提交
+    }
+    const errorEl = document.getElementById('username-error');
+
+    try {
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // 注册成功，自动登录
+        localStorage.setItem('mv_current_user', username);
+        localStorage.setItem('mv_user_token', data.token);
+        enterMainApp(username);
+      } else {
+        // 显示错误
+        if (errorEl) {
+          errorEl.textContent = data.error || 'Registration failed';
+          errorEl.classList.add('show');
+        }
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      if (errorEl) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.classList.add('show');
+      }
+    }
+  });
+
+  // 登录表单提交
+  loginForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errorEl = document.getElementById('login-error');
+
+    try {
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // 登录成功
+        localStorage.setItem('mv_current_user', username);
+        localStorage.setItem('mv_user_token', data.token);
+        enterMainApp(username);
+      } else {
+        // 显示错误
+        if (errorEl) {
+          errorEl.textContent = data.error || 'Login failed';
+          errorEl.classList.add('show');
+        }
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      if (errorEl) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.classList.add('show');
+      }
+    }
+  });
+
+  // 清除错误消息
+  // 清除密码错误提示
+  document.getElementById('reg-password')?.addEventListener('input', () => {
+    const pwError = document.getElementById('password-error');
+    if (pwError && pwError.classList.contains('show')) {
+      if (document.getElementById('reg-password').value.length >= 6) {
+        pwError.classList.remove('show');
+      }
+    }
+  });
+  document.getElementById('login-username')?.addEventListener('input', () => {
+    document.getElementById('login-error')?.classList.remove('show');
+  });
+
+  // 进入主应用
+  function enterMainApp(username) {
+    authPage?.classList.add('hidden');
+    if (mainContainer) mainContainer.style.display = 'flex';
+    updateUserDisplay(username);
+  }
+
+  // 更新用户显示
+  function updateUserDisplay(username) {
+    const profileSpan = document.querySelector('.header-profile span');
+    if (profileSpan) {
+      profileSpan.textContent = username;
+    }
+  }
+
+  // 添加登出功能
+  window.logoutUser = function() {
+    localStorage.removeItem('mv_current_user');
+    localStorage.removeItem('mv_user_token');
+    location.reload();
+  };
+})();
+
 // =======================
 // 侧栏按钮 & 页面切换
 // =======================
