@@ -163,6 +163,11 @@
   };
 })();
 
+// 设置设置处下拉菜单-登出
+document.getElementById('settings-icon')?.addEventListener('click', () => {
+  document.querySelector('.settings-dropdown')?.classList.toggle('hidden');
+});
+
 // =======================
 // 侧栏按钮 & 页面切换
 // =======================
