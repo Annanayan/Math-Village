@@ -859,5 +859,80 @@ window.toggleTheme = toggleTheme;
 })();
 
 
-
+// ========== 用户行为追踪系统 ==========
+(function initTracking() {
+  // 配置
+  const API_BASE = 'http://localhost:3000';
+  let currentPage = 'MainPage';
+  let pageStartTime = Date.now();
+  let lastActivityTime = Date.now();
+  
+  // 获取认证令牌
+  function getAuthHeaders() {
+    const token = localStorage.getItem('mv_user_token');
+    if (!token) return null;
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  }
+  
+  // 发送追踪数据
+  async function trackEvent(endpoint, data) {
+    const headers = getAuthHeaders();
+    if (!headers) return; // 未登录不追踪
+    
+    try {
+      await fetch(`${API_BASE}${endpoint}`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data)
+      });
+    } catch (error) {
+      console.error('Tracking error:', error);
+    }
+  }
+  
+  // 追踪页面浏览
+  function trackPageView(pageName) {
+    const duration = Date.now() - pageStartTime;
+    
+    // 发送前一个页面的浏览时长
+    if (currentPage && duration > 1000) { // 只记录超过1秒的访问
+      trackEvent('/track/page-view', {
+        pageName: currentPage,
+        duration: Math.floor(duration / 1000) // 转换为秒
+      });
+    }
+    
+    // 更新当前页面
+    currentPage = pageName;
+    pageStartTime = Date.now();
+  }
+  
+  // 追踪点击事件
+  function trackClick(elementId, elementType, pageName) {
+    trackEvent('/track/click', {
+      elementId: elementId,
+      elementType: elementType,
+      pageName: pageName || currentPage
+    });
+  }
+  
+  // 监听所有导航按钮点击
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pageName = btn.dataset.content;
+      trackPageView(pageName);
+      trackClick(btn.dataset.content, 'nav-button', 'Sidebar');
+    });
+  });
+  
+  // 监听所有按钮点击（全局代理）
+  document.addEventListener('click', (e) => {
+    const button = e.target.closest('button');
+    if (button && !button.classList.contains('nav-btn')) {
+      const id = button.id || button.className || 'unknown-button';
+      trackClick(id, 'button', currentPage);
+    }
 
