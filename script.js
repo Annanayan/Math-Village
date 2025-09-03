@@ -858,8 +858,9 @@ window.toggleTheme = toggleTheme;
   });
 })();
 
-
 // ========== 用户行为追踪系统 ==========
+// 将这段代码添加到你的 script.js 文件末尾
+
 (function initTracking() {
   // 配置
   const API_BASE = 'http://localhost:3000';
@@ -935,4 +936,306 @@ window.toggleTheme = toggleTheme;
       const id = button.id || button.className || 'unknown-button';
       trackClick(id, 'button', currentPage);
     }
+    
+    // 追踪链接点击
+    const link = e.target.closest('a');
+    if (link) {
+      const href = link.href || link.textContent;
+      trackClick(href, 'link', currentPage);
+    }
+  });
+  
+  // 追踪 Daily Review 按钮
+  const reviewBtn = document.getElementById('start-review');
+  if (reviewBtn) {
+    reviewBtn.addEventListener('click', () => {
+      trackClick('start-review', 'review-button', 'Daily Review');
+      trackEvent('/track/learning', {
+        subject: 'Review',
+        topic: 'Daily Review Started',
+        attempted: 1,
+        solved: 0
+      });
+    });
+  }
+  
+  // 追踪 Math Stories 收藏
+  document.addEventListener('click', (e) => {
+    const collectBtn = e.target.closest('.collect-btn');
+    if (collectBtn) {
+      const bookItem = collectBtn.closest('.book-item');
+      const title = bookItem?.querySelector('.book-title')?.textContent || 'Unknown';
+      trackClick(`collect-${title}`, 'collect-button', 'Math Stories');
+    }
+  });
+  
+  // 追踪 Daily Practice 地图钉子点击
+  document.addEventListener('click', (e) => {
+    const pin = e.target.closest('.dp-pin');
+    if (pin) {
+      const url = pin.dataset.url || 'no-url';
+      trackClick(`practice-pin-${url}`, 'practice-pin', 'Daily Practice');
+      
+      // 如果有URL，说明开始了练习
+      if (pin.dataset.url) {
+        trackEvent('/track/learning', {
+          subject: 'Practice',
+          topic: 'Daily Practice Started',
+          attempted: 1,
+          solved: 0
+        });
+      }
+    }
+  });
+  
+  // 追踪 AI Assistant 使用（修改原有的 ask 函数）
+  const originalAsk = window.ask;
+  if (typeof originalAsk === 'function') {
+    window.ask = async function(question) {
+      trackClick('ai-question-submit', 'ai-chat', 'AI Assistant');
+      return originalAsk.call(this, question);
+    };
+  }
+  
+  // 追踪 My Collection 操作
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#col-new-note')) {
+      trackClick('new-note', 'collection-action', 'My Collection');
+    }
+    if (e.target.closest('#col-save')) {
+      trackClick('save-note', 'collection-action', 'My Collection');
+      trackEvent('/track/learning', {
+        subject: 'Notes',
+        topic: 'Note Created',
+        attempted: 1,
+        solved: 1
+      });
+    }
+    if (e.target.closest('.del')) {
+      trackClick('delete-item', 'collection-action', 'My Collection');
+    }
+    if (e.target.closest('.share')) {
+      trackClick('share-item', 'collection-action', 'My Collection');
+    }
+  });
+  
+  // 追踪 Community Plaza 互动
+  document.addEventListener('click', (e) => {
+    const star = e.target.closest('.post-star');
+    if (star) {
+      const card = star.closest('.post-card');
+      const id = card?.dataset.id || 'unknown';
+      trackClick(`star-post-${id}`, 'community-star', 'Community Plaza');
+    }
+  });
+  
+  // 定期发送心跳（记录在线时长）
+  setInterval(() => {
+    const currentTime = Date.now();
+    if (currentTime - lastActivityTime < 300000) { // 5分钟内有活动
+      trackEvent('/track/page-view', {
+        pageName: currentPage,
+        duration: 30 // 30秒心跳
+      });
+    }
+  }, 30000); // 每30秒
+  
+  // 监听用户活动（鼠标移动、键盘输入）
+  let activityTimer;
+  function updateActivity() {
+    lastActivityTime = Date.now();
+    clearTimeout(activityTimer);
+    activityTimer = setTimeout(() => {
+      // 5分钟无活动，停止心跳
+      lastActivityTime = 0;
+    }, 300000);
+  }
+  
+  document.addEventListener('mousemove', updateActivity);
+  document.addEventListener('keypress', updateActivity);
+  
+  // 页面关闭时发送最后的数据
+  window.addEventListener('beforeunload', () => {
+    const duration = Date.now() - pageStartTime;
+    if (duration > 1000) {
+      // 使用 sendBeacon 确保数据发送
+      const headers = getAuthHeaders();
+      if (headers) {
+        const data = JSON.stringify({
+          pageName: currentPage,
+          duration: Math.floor(duration / 1000)
+        });
+        navigator.sendBeacon(`${API_BASE}/track/page-view`, data);
+      }
+    }
+  });
+  
+  // 初始化：记录首页访问
+  if (localStorage.getItem('mv_current_user')) {
+    trackPageView('MainPage');
+  }
+})();
 
+// ========== 学习报告展示系统 ==========
+(function initLearningReport() {
+  const API_BASE = 'http://localhost:3000';
+  
+  // 获取认证令牌
+  function getAuthHeaders() {
+    const token = localStorage.getItem('mv_user_token');
+    if (!token) return null;
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  }
+  
+  // 加载并显示学习报告
+  async function loadLearningReport() {
+    const headers = getAuthHeaders();
+    if (!headers) return;
+    
+    try {
+      // 获取统计数据
+      const statsResponse = await fetch(`${API_BASE}/user/stats`, {
+        headers: headers
+      });
+      
+      if (!statsResponse.ok) return;
+      const stats = await statsResponse.json();
+      
+      // 获取学习报告
+      const reportResponse = await fetch(`${API_BASE}/user/learning-report`, {
+        headers: headers
+      });
+      
+      if (!reportResponse.ok) return;
+      const report = await reportResponse.json();
+      
+      // 在主页显示报告
+      displayReport(stats, report);
+      
+    } catch (error) {
+      console.error('Failed to load report:', error);
+    }
+  }
+  
+  // 显示报告在主页
+  function displayReport(stats, report) {
+    const mainPage = document.getElementById('MainPage');
+    if (!mainPage) return;
+    
+    // 创建报告卡片
+    const reportCard = document.createElement('div');
+    reportCard.className = 'learning-report-card';
+    reportCard.innerHTML = `
+      <h2>📊 Personal Learning Report</h2>
+      
+      <div class="report-section">
+        <h3>👤 User Profile</h3>
+        <p><strong>Username:</strong> ${stats.basicInfo?.username || 'Unknown'}</p>
+        <p><strong>Total Logins:</strong> ${stats.basicInfo?.login_count || 0}</p>
+        <p><strong>Total Time:</strong> ${formatTime(stats.basicInfo?.total_time_spent || 0)}</p>
+        <p><strong>Member Since:</strong> ${formatDate(stats.basicInfo?.created_at)}</p>
+      </div>
+      
+      <div class="report-section">
+        <h3>📈 Learning Progress</h3>
+        <p><strong>Problems Attempted:</strong> ${report.summary?.total_attempted || 0}</p>
+        <p><strong>Problems Solved:</strong> ${report.summary?.total_solved || 0}</p>
+        <p><strong>Average Accuracy:</strong> ${(report.summary?.average_accuracy || 0).toFixed(1)}%</p>
+        <p><strong>Subjects Studied:</strong> ${report.summary?.subjects_studied || 0}</p>
+        <p><strong>Topics Covered:</strong> ${report.summary?.topics_covered || 0}</p>
+      </div>
+      
+      <div class="report-section">
+        <h3>🎯 Recent Activity (Last 7 Days)</h3>
+        <div class="activity-chart">
+          ${generateActivityChart(stats.recentLogins || [])}
+        </div>
+      </div>
+      
+      <div class="report-section">
+        <h3>🌟 Most Visited Pages</h3>
+        <ul class="top-pages">
+          ${(stats.topPages || []).map(page => 
+            `<li>${page.page_name}: ${page.visit_count} visits</li>`
+          ).join('')}
+        </ul>
+      </div>
+      
+      <div class="report-section">
+        <h3>🤖 AI Assistant Usage</h3>
+        <p><strong>Total Questions:</strong> ${stats.aiUsage?.total_questions || 0}</p>
+        <p><strong>Topics Explored:</strong> ${stats.aiUsage?.topics_covered || 0}</p>
+      </div>
+      
+      <div class="report-section">
+        <h3>💡 Personalized Recommendations</h3>
+        <ul class="recommendations">
+          ${(report.recommendations || []).map(rec => 
+            `<li>${rec}</li>`
+          ).join('')}
+        </ul>
+      </div>
+      
+      <button class="refresh-report-btn" onclick="window.loadLearningReport()">
+        🔄 Refresh Report
+      </button>
+    `;
+    
+    // 替换原有内容或添加到页面
+    mainPage.innerHTML = '';
+    mainPage.appendChild(reportCard);
+  }
+  
+  // 格式化时间
+  function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes} minutes`;
+  }
+  
+  // 格式化日期
+  function formatDate(dateString) {
+    if (!dateString) return 'Unknown';
+    return new Date(dateString).toLocaleDateString();
+  }
+  
+  // 生成活动图表
+  function generateActivityChart(logins) {
+    if (logins.length === 0) return '<p>No recent activity</p>';
+    
+    const maxTime = Math.max(...logins.map(l => l.time_spent || 0));
+    
+    return `
+      <div class="chart-container">
+        ${logins.map(login => `
+          <div class="chart-bar">
+            <div class="bar" style="height: ${(login.time_spent / maxTime) * 100}%"></div>
+            <div class="label">${login.login_date.split('-')[2]}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  // 导出函数到全局
+  window.loadLearningReport = loadLearningReport;
+  
+  // 监听主页按钮点击
+  const homeBtn = document.querySelector('.nav-btn[data-content="MainPage"]');
+  if (homeBtn) {
+    homeBtn.addEventListener('click', () => {
+      setTimeout(loadLearningReport, 100); // 延迟加载确保页面切换完成
+    });
+  }
+  
+  // 如果已登录且在主页，自动加载报告
+  if (localStorage.getItem('mv_current_user') && document.getElementById('MainPage')?.classList.contains('active')) {
+    loadLearningReport();
+  }
+})();
