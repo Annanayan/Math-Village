@@ -939,7 +939,7 @@ body.theme-fantasy .post-star.on{ background:#ffe8b6; color:#a86500; }
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #475BA5;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -986,13 +986,13 @@ body.theme-fantasy .post-star.on{ background:#ffe8b6; color:#a86500; }
 
 /* 中间卡片 */
 .auth-card {
-  background: white;
+  /* Remove background and box-shadow */
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   display: flex;
   overflow: hidden;
   max-width: 800px;
   width: 100%;
+  gap: 40px; /* Add gap between mascot and form */
 }
 
 /* 左侧吉祥物 */
@@ -1001,9 +1001,9 @@ body.theme-fantasy .post-star.on{ background:#ffe8b6; color:#a86500; }
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: 40px;
 }
+
 
 .mascot-image {
   width: 100%;
@@ -1024,6 +1024,9 @@ body.theme-fantasy .post-star.on{ background:#ffe8b6; color:#a86500; }
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
 .auth-tabs {
