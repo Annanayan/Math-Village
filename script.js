@@ -126,7 +126,7 @@
     }
   });
 
-  // 清除错误消息
+
   // 清除密码错误提示
   document.getElementById('reg-password')?.addEventListener('input', () => {
     const pwError = document.getElementById('password-error');
@@ -163,7 +163,7 @@
   };
 })();
 
-// 设置设置处下拉菜单-登出
+// 设置处下拉菜单-登出
 document.getElementById('settings-icon')?.addEventListener('click', () => {
   document.querySelector('.settings-dropdown')?.classList.toggle('hidden');
 });
@@ -174,7 +174,7 @@ document.getElementById('settings-icon')?.addEventListener('click', () => {
 const buttons  = document.querySelectorAll(".nav-btn");
 const contents = document.querySelectorAll(".content");
 
-// 先把 Home 设为激活
+// Home 设为激活
 document.getElementById("MainPage")?.classList.add("active");
 
 buttons.forEach(btn => {
@@ -192,7 +192,7 @@ buttons.forEach(btn => {
 });
 
 // =======================
-// 魔法棒：主题切换（合并成一个）
+// 魔法棒：主题切换 
 // =======================
 const themes = ['theme-night', 'theme-fantasy', 'theme-dark'];
 let currentThemeIndex = -1;
@@ -286,7 +286,7 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
 });
 
 // =======================
-// Math Tutor UI 逻辑（修复版）
+// Math Tutor UI 逻辑 
 // =======================
 (function initMathTutor() {
   const messages = document.getElementById('mv-messages');
@@ -294,7 +294,6 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
   const input = document.getElementById('mv-input');
   if (!messages || !form || !input) return;
 
-  // 更新为你的后端地址
   const ENDPOINT = 'http://localhost:3000/chat';
 
   // 保持 AI Assistant 页面激活
@@ -370,9 +369,12 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
     const bubble = addRow('assistant', '', true);
 
     try {
+      const token = localStorage.getItem('mv_user_token');
       const resp = await fetch(ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: token
+          ? { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+          : { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
             { 
