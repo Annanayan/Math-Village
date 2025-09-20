@@ -476,6 +476,46 @@ body.theme-dark .mv-send       { background:#5279ff; color:#fff; }
   border-radius: 8px;
 }
 
+/* Fix math display spacing */
+.mv-bubble .math-block {
+  margin: 8px 0;  /* Reduced from 16px */
+  padding: 8px;   /* Reduced from 12px */
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.mv-bubble .math-inline {
+  padding: 0 2px;
+  background: transparent;  /* Remove background for inline math */
+  white-space: nowrap;
+}
+
+/* Remove extra spacing after step headers */
+.mv-bubble strong {
+  color: #4c1d95;
+  font-weight: 600;
+  display: inline;  /* Changed from block to inline */
+  margin: 0;  /* Remove margins */
+}
+
+/* Ensure proper line spacing */
+.mv-bubble {
+  line-height: 1.5;  /* Reduced from 1.6 */
+}
+
+/* Fix spacing between lines */
+.mv-bubble br {
+  display: block;
+  content: "";
+  margin: 4px 0;  /* Add small margin for line breaks */
+}
+
+/* Prevent double spacing after math blocks */
+.mv-bubble .math-block + br {
+  display: none;
+}
+
 .math-inline {
   padding: 0 4px;
   background: rgba(255, 255, 255, 0.3);
