@@ -313,6 +313,9 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
       let formatted = text
         .replace(/^\s*---+\s*$/gm, '') // Remove horizontal rules
         .replace(/^#{1,6}\s+/gm, '') // Remove markdown headers
+        .replace(/^\s*-\s+/gm, '') // Remove bullet points at start of lines
+        .replace(/^\s*\*\s+/gm, '') // Remove asterisk bullets
+        .replace(/^\s*•\s+/gm, '') // Remove bullet characters        
         .replace(/\n{3,}/g, '\n\n'); // Reduce excessive line breaks to max 2
       
       // Handle LaTeX math - must be done before HTML conversion
