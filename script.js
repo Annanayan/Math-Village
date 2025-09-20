@@ -466,22 +466,23 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
   
   // 配置 MathJax
   window.MathJax = {
-    tex: {
-      inlineMath: [['\\(', '\\)'], ['$', '$']],
-      displayMath: [['\\[', '\\]'], ['$$', '$$']],
-      processEscapes: true,
-      processEnvironments: true
-    },
-    options: {
-      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-    },
-    startup: {
-      pageReady: () => {
-        return MathJax.startup.defaultPageReady().then(() => {
-          console.log('MathJax 初始化完成');
-        });
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        processEscapes: false,  // Changed to false
+        processEnvironments: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        processHtmlClass: 'math-inline|math-block'  // Only process our math classes
+      },
+      startup: {
+        pageReady: () => {
+          return MathJax.startup.defaultPageReady().then(() => {
+            console.log('MathJax ready');
+          });
+        }
       }
-    }
   };
 })();
 
