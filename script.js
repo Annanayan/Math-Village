@@ -417,7 +417,24 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
         })
       });
 
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      // 原来是：if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      if (!resp.ok) {
+        let errMsg = `HTTP ${resp.status}`;
+        try {
+          const j = await resp.json();
+          if (j?.content) errMsg += ` - ${j.content}`;
+          else if (j?.error) errMsg += ` - ${j.error}`;
+          else if (j?.message) errMsg += ` - ${j.message}`;
+        } catch {
+          try {
+            const t = await resp.text();
+            if (t) errMsg += ` - ${t.slice(0, 200)}`;
+          } catch {}
+        }
+        throw new Error(errMsg);
+      }
+
+      
       const data = await resp.json();
       
       // 使用格式化后的内容
