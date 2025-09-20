@@ -329,9 +329,10 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
         return `<span class="math-inline">\\(${math}\\)</span>`;
       });
       
-      // Bold text (including step headers)
-      formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      
+      // Bold text (step headers)
+      formatted = formatted.replace(/\*\*\s*(Step\s*\d+\s*:[^*]*)\s*\*\*/gi, '<strong class="mv-step">$1</strong>');
+      formatted = formatted.replace(/\*\*(.+?)\*\*/gs, '$1');
+    
       // Convert newlines to <br> more intelligently
       formatted = formatted.split('\n').map((line, index, arr) => {
         // Skip empty lines after headers
