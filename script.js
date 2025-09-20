@@ -312,6 +312,13 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
   function formatContent(text) {
     // 处理换行符
     let formatted = text.replace(/\n/g, '<br>');
+
+    text = text
+      .replace(/^\s*---\s*$/gm, '')
+      .replace(/^\s*#{3,6}\s*$/gm, '')
+      .replace(/^\s*#{1,6}\s*(Step\s*\d+:[^\n]+)\s*$/gm, '$1')
+      .replace(/[ \t]+$/gm, '')
+      .replace(/(Step\s*\d+:[^\n]+)\n{2,}/g, '$1\n');
     
     // 处理 LaTeX 公式
     // 替换 $$ ... $$ 为块级公式
@@ -326,6 +333,11 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
     // 加粗步骤标题
     formatted = formatted.replace(/\*\*(Step \d+:.*?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/\*\*(Step \d+:.*?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // 如果加粗后的标题后面连着两个 <br>，压成一个，去除标题后的大空白
+    formatted = formatted.replace(/(<strong>Step\s*\d+:[^<]*<\/strong>)<br>\s*<br>/g, '$1<br>');
+    
     
     return formatted;
   }
