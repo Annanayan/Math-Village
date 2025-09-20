@@ -308,39 +308,43 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
     });
   }
 
-  // 格式化消息内容（处理 LaTeX 和换行）
   function formatContent(text) {
-    // 处理换行符
-    let formatted = text.replace(/\n/g, '<br>');
-
-    text = text
-      .replace(/^\s*---\s*$/gm, '')
-      .replace(/^\s*#{3,6}\s*$/gm, '')
-      .replace(/^\s*#{1,6}\s*(Step\s*\d+:[^\n]+)\s*$/gm, '$1')
-      .replace(/[ \t]+$/gm, '')
-      .replace(/(Step\s*\d+:[^\n]+)\n{2,}/g, '$1\n');
-    
-    // 处理 LaTeX 公式
-    // 替换 $$ ... $$ 为块级公式
-    formatted = formatted.replace(/\$\$(.*?)\$\$/g, '<div class="math-block">\\[$1\\]</div>');
-    
-    // 替换 $ ... $ 为行内公式
-    formatted = formatted.replace(/\$(.*?)\$/g, '<span class="math-inline">\\($1\\)</span>');
-    
-    // 处理 \frac 等常见 LaTeX 命令（如果没有被 $ 包围）
-    formatted = formatted.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '<span class="math-inline">\\(\\frac{$1}{$2}\\)</span>');
-    
-    // 加粗步骤标题
-    formatted = formatted.replace(/\*\*(Step \d+:.*?)\*\*/g, '<strong>$1</strong>');
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    formatted = formatted.replace(/\*\*(Step \d+:.*?)\*\*/g, '<strong>$1</strong>');
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // 如果加粗后的标题后面连着两个 <br>，压成一个，去除标题后的大空白
-    formatted = formatted.replace(/(<strong>Step\s*\d+:[^<]*<\/strong>)<br>\s*<br>/g, '$1<br>');
-    
-    
-    return formatted;
+      // First, clean up any markdown artifacts from the AI
+      let formatted = text
+        .replace(/^\s*---+\s*$/gm, '') // Remove horizontal rules
+        .replace(/^#{1,6}\s+/gm, '') // Remove markdown headers
+        .replace(/\n{3,}/g, '\n\n'); // Reduce excessive line breaks to max 2
+      
+      // Handle LaTeX math - must be done before HTML conversion
+      // Block math: $$ ... $$
+      formatted = formatted.replace(/\$\$(.*?)\$\$/gs, (match, math) => {
+        return `<div class="math-block">\\[${math}\\]</div>`;
+      });
+      
+      // Inline math: $ ... $
+      formatted = formatted.replace(/\$(.*?)\$/g, (match, math) => {
+        return `<span class="math-inline">\\(${math}\\)</span>`;
+      });
+      
+      // Bold text (including step headers)
+      formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      
+      // Convert newlines to <br> but not inside math blocks
+      formatted = formatted.split('\n').map(line => {
+        // Don't add <br> after block math or strong tags
+        if (line.includes('math-block') || line.match(/^<strong>Step \d+:/)) {
+          return line;
+        }
+        return line;
+      }).join('<br>\n');
+      
+      // Clean up spacing around math blocks
+      formatted = formatted.replace(/<br>\s*<div class="math-block">/g, '<div class="math-block">');
+      formatted = formatted.replace(/<\/div>\s*<br>/g, '</div>');
+      
+      return formatted;
   }
+
 
   // 生成消息行
   function addRow(role, text, typing = false) {
