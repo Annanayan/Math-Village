@@ -1415,3 +1415,23 @@ body.theme-dark .chart-bar .label {
     width: 20px;
   }
 }
+
+/* 隐藏 AI 页顶部的图标和标题，释放空间 */
+.mv-hero { 
+  display: none !important; 
+}
+
+/* 减小整体上边距，卡片更靠上 */
+section[id="AI Assistant"].content {
+  padding-top: 8px;
+}
+
+/* 放大聊天区：卡片更宽、消息区更高 */
+.mv-card { 
+  width: min(1000px, 96%);     /* 原来是 min(900px, 92%) */
+}
+
+.mv-messages {
+  max-height: clamp(520px, 68vh, 820px);  /* 原来是 clamp(300px, 52vh, 560px) */
+}
+
