@@ -231,42 +231,59 @@ window.toggleTheme = toggleTheme;
   container.querySelectorAll('.dp-pin').forEach(pin => pin.setAttribute('tabindex','0'));
 })();
 
-  // —— Math Stories：星标切换（收藏/取消收藏） —— //
-  function syncStoryStars(){
-    const items = load().filter(i=>i.type==='story');
-    const titles = new Set(items.map(i=>i.title));
-    document.querySelectorAll('.book-item').forEach(card=>{
-      const title = card.querySelector('.book-title')?.textContent?.trim();
-      const btn = card.querySelector('.collect-btn');
-      if (!btn) return;
-      if (titles.has(title)) btn.classList.add('on'); else btn.classList.remove('on');
-    });
-  }
-
+// —— Math Stories：星标切换（收藏/取消收藏） —— //
+function syncStoryStars(){
+  if (!window.mvCollection) return;
+  const items = window.mvCollection.load().filter(i=>i.type==='story');
+  const titles = new Set(items.map(i=>i.title));
   document.querySelectorAll('.book-item').forEach(card=>{
-    if (card.querySelector('.collect-btn')) return;
-    const btn = document.createElement('button');
-    btn.className='collect-btn'; btn.title='Collect';
-    btn.innerHTML = '<i class="fas fa-star"></i>';
-    card.appendChild(btn);
+    const title = card.querySelector('.book-title')?.textContent?.trim();
+    const btn = card.querySelector('.collect-btn');
+    if (!btn) return;
+    if (titles.has(title)) btn.classList.add('on'); else btn.classList.remove('on');
   });
+}
 
-  // 绑定切换
-  document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const card  = btn.closest('.book-item');
-      const title = card.querySelector('.book-title')?.textContent?.trim() || 'Story';
-      const items = load();
-      const idx   = items.findIndex(i=>i.type==='story' && i.title===title);
-      if (idx>=0){
-        items.splice(idx,1);               // 取消收藏
-      }else{
-        items.push({ id:'s_'+Date.now(), type:'story', title, content:'Saved from Math Stories', createdAt:Date.now() });
-      }
-      save(items); render(); syncStoryStars();
-    });
+// 全局暴露
+window.syncStoryStars = syncStoryStars;
+
+// 初始化收藏按钮
+document.querySelectorAll('.book-item').forEach(card=>{
+  if (card.querySelector('.collect-btn')) return;
+  const btn = document.createElement('button');
+  btn.className='collect-btn'; btn.title='Collect';
+  btn.innerHTML = '<i class="fas fa-star"></i>';
+  card.appendChild(btn);
+});
+
+// 绑定切换
+document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if (!window.mvCollection) return;
+    const card  = btn.closest('.book-item');
+    const title = card.querySelector('.book-title')?.textContent?.trim() || 'Story';
+    const items = window.mvCollection.load();
+    const idx   = items.findIndex(i=>i.type==='story' && i.title===title);
+    if (idx>=0){
+      items.splice(idx,1);
+    }else{
+      items.push({ 
+        id:'s_'+Date.now(), 
+        type:'story', 
+        title, 
+        content:'Saved from Math Stories', 
+        createdAt:Date.now() 
+      });
+    }
+    window.mvCollection.save(items); 
+    
+    // 触发 My Collection 刷新（如果它是活动页面）
+    if (document.getElementById('My Collection')?.classList.contains('active')){
+      if (window.mvRender) window.mvRender();
+    }
+    syncStoryStars();
   });
-
+});
 
 // =======================
 // Math Tutor UI 逻辑（修复版）
@@ -486,6 +503,8 @@ window.toggleTheme = toggleTheme;
   const load = () => JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
   const save = (arr) => localStorage.setItem(STORE_KEY, JSON.stringify(arr));
 
+  window.mvCollection = { load, save }; // 全局暴露
+
   const loadPlaza = () => JSON.parse(localStorage.getItem(PLAZA_KEY) || '[]');
   const savePlaza = (arr) => localStorage.setItem(PLAZA_KEY, JSON.stringify(arr));
 
@@ -518,6 +537,7 @@ window.toggleTheme = toggleTheme;
       </div>`;
     }).join('');
   }
+  window.mvRender = render; // 暴露 render 函数到全局
 
   // —— 新建/编辑 笔记（编辑器卡片） —— //
   function openEditor(note){
@@ -605,7 +625,7 @@ window.toggleTheme = toggleTheme;
   function delItem(id){
     const items = load().filter(i=>i.id!==id); save(items); render(); // 取消收藏/删除
     // 同步 Math Stories 的星标
-    syncStoryStars();
+    if (window.syncStoryStars) window.syncStoryStars();
     if (modalEl && !modalEl.classList.contains('hidden') && viewingId===id) modalEl.classList.add('hidden');
   }
 
@@ -827,6 +847,7 @@ window.toggleTheme = toggleTheme;
 
   function render(){ FEED.innerHTML = all.map(cardHTML).join(''); }
   render();
+  window.renderPlaza = render;
 
   // 点击星标：收藏/取消收藏 + UI 同步
   FEED.addEventListener('click', (e)=>{
@@ -1239,3 +1260,35 @@ window.toggleTheme = toggleTheme;
     loadLearningReport();
   }
 })();
+
+// 页面切换时的初始化
+buttons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.content;
+
+    // 切换按钮高亮
+    buttons.forEach(b => b.classList.toggle("active", b === btn));
+
+    // 切换页面显示 - 修复逻辑
+    contents.forEach(page => {
+      page.classList.remove("active");
+      page.classList.add("hidden");
+    });
+    
+    const targetPage = document.getElementById(id);
+    if (targetPage) {
+      targetPage.classList.remove("hidden");
+      targetPage.classList.add("active");
+    }
+    
+    // 页面切换后的初始化
+    if (id === 'My Collection' && window.mvRender) {
+      window.mvRender();
+      if (window.syncStoryStars) window.syncStoryStars();
+    } else if (id === 'Math Stories' && window.syncStoryStars) {
+      window.syncStoryStars();
+    } else if (id === 'Community Plaza' && window.renderPlaza) {
+      window.renderPlaza();
+    }
+  });
+});
