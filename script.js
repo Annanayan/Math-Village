@@ -329,14 +329,18 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
       // Bold text (including step headers)
       formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       
-      // Convert newlines to <br> but not inside math blocks
-      formatted = formatted.split('\n').map(line => {
-        // Don't add <br> after block math or strong tags
-        if (line.includes('math-block') || line.match(/^<strong>Step \d+:/)) {
-          return line;
+      // Convert newlines to <br> more intelligently
+      formatted = formatted.split('\n').map((line, index, arr) => {
+        // Skip empty lines after headers
+        if (line.trim() === '' && index > 0 && arr[index-1].includes('<strong>')) {
+          return '';
         }
         return line;
-      }).join('<br>\n');
+      }).filter(line => line !== null).join('<br>\n');
+      
+      // Remove <br> immediately after strong tags (headers)
+      formatted = formatted.replace(/<\/strong><br>/g, '</strong>');
+      formatted = formatted.replace(/<\/strong>\s*<br>/g, '</strong>');
       
       // Clean up spacing around math blocks
       formatted = formatted.replace(/<br>\s*<div class="math-block">/g, '<div class="math-block">');
