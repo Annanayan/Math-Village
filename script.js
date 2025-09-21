@@ -60,7 +60,7 @@
     const errorEl = document.getElementById('username-error');
 
     try {
-      const response = await fetch('https://https://math-village-backend-server.onrender.com/register', {
+      const response = await fetch('http://localhost:3000/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -97,7 +97,7 @@
     const errorEl = document.getElementById('login-error');
 
     try {
-      const response = await fetch('https://https://math-village-backend-server.onrender.com/login', {
+      const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -294,9 +294,9 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
   const input = document.getElementById('mv-input');
   if (!messages || !form || !input) return;
 
-  const ENDPOINT = 'https://https://math-village-backend-server.onrender.com/chat';
+  const ENDPOINT = 'http://localhost:3000/chat';
 
-  // 保持 AI Assistant 页面激活/chat
+  // 保持 AI Assistant 页面激活
   function keepAssistantActive() {
     const assistant = document.getElementById('AI Assistant');
     if (!assistant) return;
@@ -928,7 +928,7 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
 
 (function initTracking() {
   // 配置
-  const API_BASE = '  const ENDPOINT = 'https://https://math-village-backend-server.onrender.com';
+  const API_BASE = 'http://localhost:3000';
   let currentPage = 'MainPage';
   let pageStartTime = Date.now();
   let lastActivityTime = Date.now();
@@ -1143,7 +1143,7 @@ document.querySelectorAll('.book-item .collect-btn').forEach(btn=>{
 
 // ========== 学习报告展示系统 ==========
 (function initLearningReport() {
-  const API_BASE = 'https://https://math-village-backend-server.onrender.com';
+  const API_BASE = 'http://localhost:3000';
   
   // 获取认证令牌
   function getAuthHeaders() {
